@@ -2,8 +2,12 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+import requests
+from bs4 import BeautifulSoup
 
 from selenium.common.exceptions import TimeoutException
+
+from page_parser import get_description
 
 
 driver = webdriver.Chrome()
@@ -48,11 +52,14 @@ def get_page_info():
 
 
 def main():
-    list_items = get_list()
-    print(list_items)
-    # for id in list(list_items):
-    #     download(href)
-
-
+    # list_items = get_list() 
+    list_items = ["https://www.loc.gov/item/2021670601/"]
+    page_descriptions = []
+    for href in list(list_items):
+        print(href)
+        description = get_description(href)
+        page_descriptions.append(description)
+        break
+ 
 if __name__ == "__main__":
     main()
