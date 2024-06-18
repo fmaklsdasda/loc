@@ -1,23 +1,28 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+import time
 
-service = Service(ChromeDriverManager().install())
-driver = webdriver.Chrome(service=service)
+driver = webdriver.Chrome()
+driver.implicitly_wait(5)
 
-# Переход на сайт
-url = "https://www.loc.gov/item/2021670601/"
-driver.get(url)
 
-title_element = driver.find_element(By.XPATH, "//div[@id='item-title']/h1")
-description_elements = driver.find_elements(By.XPATH, "//div[@class='item-summary']/p")
-
-title = title_element.text
-descriptions = [element.text for element in description_elements]
-
-print("Title:", title)
-for i, description in enumerate(descriptions, start=1):
-    print(f"Description {i}: {description}")
-
-driver.quit()
+def get_description(href: str):
+    driver.get(href)
+    try:
+        element = WebDriverWait(driver, 3).until(
+            EC.presence_of_element_located((By.ID, "item-cataloged-data"))
+        )
+        children = driver.find_elements(By.CSS_SELECTOR, "#item-cataloged-data > *")
+        description = dict()
+        for i in range(0, len(children), 2):  
+            key = children[i].text.strip()
+            value = children[i + 1].text.strip()
+            description[key] = value
+        return description
+    except Exception as e:
+        print(f"Error getting description: {e}")
+        return None
