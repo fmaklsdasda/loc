@@ -1,3 +1,4 @@
+import csv
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
@@ -59,7 +60,13 @@ def main():
         print(href)
         description = get_description(href)
         page_descriptions.append(description)
-        break
+    
+    keys = page_descriptions[0].keys()
+
+    with open('description.csv', 'w', newline='') as output_file:
+        dict_writer = csv.DictWriter(output_file, keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(page_descriptions)
  
 if __name__ == "__main__":
     main()
