@@ -1,14 +1,13 @@
 import csv
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-import requests
-from bs4 import BeautifulSoup
+import urllib.request
 
 from selenium.common.exceptions import TimeoutException
 
-from page_parser import get_description
+from page_parser import PageParser
 
 
 driver = webdriver.Chrome()
@@ -48,18 +47,20 @@ def get_list():
 def get_page_info():
 
     html_source = driver.page_source
-    print(html_source)
     return html_source
 
 
 def main():
     # list_items = get_list() 
-    list_items = ["https://www.loc.gov/item/2021670601/"]
+    list_items = [2021670601]
     page_descriptions = []
-    for href in list(list_items):
-        print(href)
-        description = get_description(href)
-        page_descriptions.append(description)
+    for id in list(list_items):
+        parser = PageParser(id = id)
+        parser.get_description()
+        parser.get_photo_url()
+        page_descriptions.append(parser.description)
+        if parser.photo_url:
+            urllib.request.urlretrieve(parser.photo_url, f"{parser.id}.jpg")
     
     keys = page_descriptions[0].keys()
 
